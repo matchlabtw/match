@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2P7M7D2TJH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2P7M7D2TJH');
+  </script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>瑪那熊配對實驗室</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <style>
+    body { background-color: #fdf2f8; font-family: 'Microsoft JhengHei', Helvetica, Arial, sans-serif; }
+    .text-brand-dark { color: #111827; }
+    .text-brand-gray { color: #6b7280; }
+    .text-brand-red { color: #d11747; }
+    .bg-custom-pink { background-color: #fdf2f8; }
+    .border-custom-pink { border-color: #fce7f3 !important; }
+    .profile-card { border-radius: 24px; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.1); border: 1px solid #fce7f3; }
+    .info-box { background-color: #fdf2f8; border: 1px solid #fce7f3; border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; display: block; text-decoration: none; }
+    .section-divider { border-top: 2px solid #fdf2f8; padding-top: 30px; margin-top: 30px; }
+    .p-x-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+    .form-control:focus { border-color: #fce7f3; box-shadow: 0 0 0 0.25rem rgba(236, 72, 153, 0.25); }
+    #loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(253, 242, 248, 0.85); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 9999; display: none; justify-content: center; align-items: center; }
+    .progress-bar { transition: width 0.2s ease; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="card profile-card bg-white border-0 text-center w-100 mx-3" style="max-width: 400px;">
+      <div class="card-body p-4 p-md-5">
+        <h5 class="fw-bold text-brand-dark mb-4">資料配對讀取中...</h5>
+        <div class="progress" style="height: 20px; border-radius: 10px;">
+          <div id="loading-progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; background-color: #d11747;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="login-section" class="container-fluid py-5 p-x-2 d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card profile-card bg-white border-0 text-center w-100" style="max-width: 450px;">
+      <div class="card-body p-4 p-md-5">
+        <img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/03/e791aae982a3e7868ae6849be68385e9858de5b08d_e58ebbe8838c_e696b0_e7b78ae8b2bc.png" alt="LoveMatch" width="150" class="img-fluid mb-4" />
+        <h4 class="fw-bold text-brand-dark mb-4">配對資料查詢</h4>
+
+        <div class="text-start mb-3">
+          <label for="input-email" class="form-label text-brand-gray fw-bold" style="font-size: 14px;">電子信箱 (Email)</label>
+          <input type="email" id="input-email" class="form-control form-control-lg bg-custom-pink border-custom-pink" placeholder="example@mail.com">
+        </div>
+
+        <div class="text-start mb-4">
+          <label for="input-birthYear" class="form-label text-brand-gray fw-bold" style="font-size: 14px;">出生年</label>
+          <input type="number" id="input-birthYear" class="form-control form-control-lg bg-custom-pink border-custom-pink" placeholder="(民國年，如：80)" oninput="if(value.length>2)value=value.slice(0,2)">
+        </div>
+
+        <button class="btn btn-lg w-100 text-white fw-bold py-3" type="button" id="btn-submit" style="background-color: #d11747; border-radius: 12px;">開始查詢</button>
+        <div id="login-error" class="text-danger mt-3 fw-bold" style="display: none; font-size: 14px; white-space: pre-wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="main-content" class="container-fluid py-4 p-x-2" style="max-width: 800px; display: none;">
+    <div class="card profile-card bg-white border-0">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <span class="fs-4 fw-bold text-brand-gray align-middle">暱稱：</span>
+          <span id="val-name" class="fw-bolder text-brand-dark align-middle" style="font-size: 70px; line-height: 1.1;"></span>
+        </div>
+
+        <div class="section-divider">
+          <h5 class="fw-bold text-brand-dark mb-4">🧑 關於你</h5>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">生理性別</span><span id="val-sex" class="fw-bold"></span></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">出生年</span><span class="fw-bold">民國 <span id="val-birth_year"></span> 年 · <span id="val-age"></span> 歲</span></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">身高</span><span class="fw-bold"><span id="val-height"></span> 公分</span></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">居住地區</span><span id="val-location" class="fw-bold"></span></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">婚姻狀態</span><span id="val-marriage_status" class="fw-bold"></span></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">工作型態</span><span id="val-work_style" class="fw-bold"></span></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">興趣</span><span id="val-interests" class="fw-bold"></span></div>
+          <div class="info-box mb-0"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">興趣補充</span><span id="val-supplement" class="fw-bold"></span></div>
+        </div>
+
+        <div class="section-divider">
+          <h5 class="fw-bold text-brand-dark mb-4">💖 理想對象</h5>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">對象年齡範圍</span><span id="val-target_age" class="fw-bold"></span></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">對象居住地區</span><span id="val-target_location" class="fw-bold"></span></div>
+          <div class="info-box mb-0"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">對象婚姻狀態</span><span id="val-target_marriage_status" class="fw-bold"></span></div>
+        </div>
+
+        <div class="section-divider">
+          <h5 class="fw-bold text-brand-dark mb-4">🎯 契合測驗</h5>
+          <div id="val-compatibility"></div>
+        </div>
+
+        <div class="section-divider">
+          <h5 class="fw-bold text-brand-dark mb-4">🔍 生活與工作側寫</h5>
+          <div id="val-life_work"></div>
+        </div>
+
+        <div class="section-divider">
+          <h5 class="fw-bold text-brand-dark mb-4">💬 聯絡方式</h5>
+          <div id="contact-list">
+            <div id="block-email" class="info-box" style="display:none;"><span class="text-brand-gray d-block mb-1" style="font-size:12px;">Email</span><span id="val-email_id" class="fw-bold"></span></div>
+
+            <div id="block-auth_method" class="info-box" style="display:none;"><span class="text-brand-gray d-block mb-1" style="font-size:12px;">為確保活動安全與真實性，若方便提供任一社群帳號，將優先安排配對，並提高媒合機會 (瑪那熊僅用於身份確認，不會公開)</span><span id="val-auth_method" class="fw-bold"></span></div>
+
+            <a id="val-social_link" href="#" target="_blank" class="info-box" style="display:none;"><span id="val-social_label" class="text-brand-gray d-block mb-1" style="font-size:12px;">社群 ID (點擊前往)</span><span id="val-social_id" class="fw-bold"></span></a>
+
+            <div id="block-share_social" class="info-box" style="display:none;"><span class="text-brand-gray d-block mb-1" style="font-size:12px;">若成功配對，你是否願意讓對方查看你的社群帳號？(讓對方更真實地認識你的生活)</span><span id="val-share_social" class="fw-bold"></span></div>
+
+          </div>
+        </div>
+
+        <div class="section-divider" id="block-suggestion-container" style="display:none;">
+          <h5 class="fw-bold text-brand-dark mb-4">💡 建議</h5>
+          <div class="info-box mb-0"><span id="val-suggestion" class="fw-bold"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-5 mb-4 p-x-2">
+      <img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/03/e791aae982a3e7868ae6849be68385e9858de5b08d_e58ebbe8838c_e696b0_e7b78ae8b2bc.png" alt="LoveMatch" width="180" class="img-fluid mb-2" />
+      <p class="fs-6 fw-bold text-brand-red mb-3">© 瑪那熊配對實驗室</p>
+
+      <div class="d-flex justify-content-center align-items-center gap-2 pt-2 pb-4 lh-1">
+        <a href="https://matchlabtw.pse.is/mbwp1" class="text-decoration-none">
+          <img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/03/wordpress.png" alt="WordPress" width="36" height="36" class="d-block rounded-circle border-0" />
+        </a>
+        <a href="https://matchlabtw.pse.is/mbfb1" class="text-decoration-none">
+          <img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/03/facebook.png" alt="Facebook" width="36" height="36" class="d-block rounded-circle border-0" />
+        </a>
+        <a href="https://matchlabtw.pse.is/mbig1" class="text-decoration-none">
+          <img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/03/instagram.png" alt="Instagram" width="36" height="36" class="d-block rounded-circle border-0" />
+        </a>
+        <a href="https://matchlabtw.pse.is/mbth1" class="text-decoration-none">
+          <img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/03/threads.png" alt="Threads" width="36" height="36" class="d-block rounded-circle border-0" />
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const COMPATIBILITY_QUESTIONS = [
+      "未來2-3年你對感情的期待?",
+      "你希望未來的生活節奏?",
+      "你平常的消費習慣?",
+      "你希望日常與伴侶的互動節奏?",
+      "當你心情低落時，通常會怎麼做?",
+      "在理想關係中，你希望伴侶扮演什麼角色?",
+      "你認為自己的社交風格?",
+      "你對人生藍圖的規劃習慣?",
+      "面對權威角色(如父母或主管)，你習慣的因應模式?"
+    ];
+
+    function escapeHtml(unsafe) {
+      if (!unsafe) return "";
+      return unsafe.toString()
+           .replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#039;");
+    }
+
+    $(document).ready(function() {
+      // 請將下方替換為你的 GAS 部署網址
+      const API_URL = "https://script.google.com/macros/s/AKfycbzgLv9ThR4hyj-u7e9m5KQcy7CeIHfl_fRRqkdlwBsXSl2VWpM-Cr62pP7zrlaPhSUuJw/exec";
+
+      let progressInterval;
+      let isFetching = false;
+
+      let clientIp = "unknown";
+      $.getJSON("https://api.ipify.org?format=json")
+        .done(function(data) {
+          clientIp = data.ip;
+        })
+        .fail(function() {
+          console.warn("無法取得 IP 狀態");
+        });
+
+      $("#btn-submit").click(fetchUserData);
+      $("#input-email, #input-birthYear").keypress(e => { if (e.which == 13) fetchUserData(); });
+
+      function fetchUserData() {
+        if (isFetching) return;
+
+        const email = $("#input-email").val().trim();
+        const birthYear = $("#input-birthYear").val().trim();
+        const birthYearNum = parseInt(birthYear, 10);
+
+        if (!email || !birthYear) { showError("⚠️ 請完整填寫 Email 與 出生年"); return; }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) { showError("⚠️ Email 格式不正確"); return; }
+
+        if (isNaN(birthYearNum) || birthYearNum < 35 || birthYearNum > 92) {
+          showError("⚠️ 出生年需介於 35 到 92 之間");
+          return;
+        }
+
+        isFetching = true;
+        $("#btn-submit").prop("disabled", true).text("查詢中...");
+        $("#login-error").hide();
+        $("#loading-progress").css("width", "0%");
+        $("#loading-overlay").css("display", "flex").hide().fadeIn(200);
+
+        let percent = 0;
+        progressInterval = setInterval(() => {
+          percent += Math.random() * 8 + 2;
+          if (percent > 85) percent = 85;
+          $("#loading-progress").css("width", percent + "%");
+        }, 150);
+
+        const startTime = Date.now();
+
+        $.ajax({
+          url: API_URL,
+          type: "POST",
+          contentType: "text/plain;charset=utf-8",
+          data: JSON.stringify({
+            email: email,
+            birthYear: birthYear,
+            ip: clientIp
+          }),
+          dataType: "json",
+          success: function(response) {
+            clearInterval(progressInterval);
+            const remainingTime = Math.max(0, 1000 - (Date.now() - startTime));
+
+            setTimeout(() => {
+              if (response.status === "success") {
+
+                // ⭐ 新增 GA 追蹤事件
+                if (typeof gtag === 'function') {
+                  gtag('event', 'search_success', {
+                    'event_category': 'User Engagement',
+                    'event_label': '成功查詢配對資料'
+                  });
+                }
+
+                renderData(response.data);
+                $("#loading-progress").css("width", "100%");
+                setTimeout(() => {
+                  // ⭐ 修正點：移除 d-flex 類別，確保 hide() 能順利作用
+                  $("#login-section").removeClass("d-flex").hide();
+
+                  $("#main-content").show();
+                  $("#loading-overlay").fadeOut(400);
+
+                  $("#input-email").val("");
+                  $("#input-birthYear").val("");
+
+                }, 400);
+              } else {
+                $("#loading-overlay").fadeOut(300, () => showError("⚠️ " + response.message));
+              }
+            }, remainingTime);
+          },
+          error: function(xhr, status, error) {
+            clearInterval(progressInterval);
+            console.error("API 錯誤:", error);
+            $("#loading-overlay").fadeOut(300, () => showError("⚠️ 系統連線錯誤，請稍後再試"));
+          },
+          complete: function() {
+            isFetching = false;
+            $("#btn-submit").prop("disabled", false).text("開始查詢");
+          }
+        });
+      }
+
+      function showError(msg) { $("#login-error").text(msg).fadeIn(); }
+
+      function renderData(data) {
+        $("#val-name").text(data["暱稱"] || "未填寫");
+        $("#val-sex").text(data["生理性別"] || "");
+        $("#val-birth_year").text(data["出生年"] || "");
+        $("#val-age").text(data["年齡"] || "");
+        $("#val-height").text(data["身高"] || "");
+        $("#val-location").text((data["居住地區"] || data["地區"] || "") + (data["居住地區_其他"] ? " (" + data["居住地區_其他"] + ")" : ""));
+        $("#val-marriage_status").text(data["婚姻狀態"] || "");
+
+        $("#val-work_style").html(formatMultiLine(data["工作型態"]));
+        $("#val-interests").html(formatMultiLine(data["興趣"]));
+        $("#val-supplement").text(data["興趣補充"] || "未填寫");
+
+        $("#val-target_age").text(data["對象最小年齡"] + " 歲 ~ " + data["對象最大年齡"] + " 歲");
+        $("#val-target_location").html(formatMultiLine(data["對象居住地區"]));
+        $("#val-target_marriage_status").html(formatMultiLine(data["對象婚姻狀態"]));
+        $("#val-compatibility").html(formatCompatibility(data));
+
+        let lifeWorkHtml = "";
+        if (data["生活照網址"]) {
+            lifeWorkHtml += `<img src="${escapeHtml(data["生活照網址"])}" alt="生活照" class="img-fluid rounded-4 w-100 mb-4" />`;
+        }
+        if (data["簡單描述你的生活"]) {
+            lifeWorkHtml += `<div class="mb-3">${escapeHtml(data["簡單描述你的生活"]).replace(/\n/g, "<br/>")}</div>`;
+        }
+        if (data["簡單描述你的工作"]) {
+            lifeWorkHtml += `<div class="mb-3"><b>關於我的工作：</b><br/>${escapeHtml(data["簡單描述你的工作"]).replace(/\n/g, "<br/>")}</div>`;
+        }
+        $("#val-life_work").html(lifeWorkHtml || '<div class="info-box">未填寫</div>');
+
+        // 將所有可能動態顯示的欄位先隱藏
+        $("#contact-list div, #contact-list a, #block-suggestion-container").hide();
+
+        if (data["身分驗證方式"]) { $("#val-auth_method").text(data["身分驗證方式"]); $("#block-auth_method").show(); }
+        if (data["Email"]) { $("#val-email_id").text(data["Email"]); $("#block-email").show(); }
+
+        // ⭐ 新增：渲染「分享社群帳號」資料
+        if (data["分享社群帳號"]) {
+            $("#val-share_social").text(data["分享社群帳號"]);
+            $("#block-share_social").show();
+        }
+
+        // 修改過的社群連結 JS 邏輯
+        if (data["Social ID"]) {
+          let socialId = data["Social ID"];
+          let authMethod = data["身分驗證方式"];
+          let socialUrl = "#";
+          let socialLabel = "社群 ID (點擊前往)";
+
+          if (authMethod === "Facebook") {
+            socialUrl = escapeHtml(socialId);
+            socialLabel = "Facebook ID (點擊前往)";
+          } else if (authMethod === "Threads") {
+            // 處理 Threads 帳號可能帶有 @ 的情況
+            let cleanId = socialId.startsWith('@') ? socialId.substring(1) : socialId;
+            socialUrl = "https://www.threads.net/@" + escapeHtml(cleanId);
+            socialLabel = "Threads ID (點擊前往)";
+          } else {
+            // 預設或 Instagram
+            socialUrl = "https://www.instagram.com/" + escapeHtml(socialId);
+            socialLabel = "Instagram ID (點擊前往)";
+          }
+
+          $("#val-social_label").text(socialLabel);
+          $("#val-social_id").text(socialId);
+          $("#val-social_link").attr("href", socialUrl).show();
+        }
+
+        if (data["建議"]) { $("#val-suggestion").text(data["建議"]); $("#block-suggestion-container").show(); }
+      }
+
+      function formatCompatibility(data) {
+        let html = "";
+        COMPATIBILITY_QUESTIONS.forEach(q => {
+          let ans = data[q] || data[q.replace("?", "")] || data[q.replace("?", "？")];
+          if (ans) html += `<div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size:12px;">${q}</span><span class="fw-bold">${escapeHtml(ans)}</span></div>`;
+        });
+        return html || '<div class="info-box">這次先進行基本配對就好</div>';
+      }
+
+      function formatMultiLine(str) {
+        if (!str) return "<span class='text-muted'>尚無資料</span>";
+        return str.split(/[,，]/).map(s => escapeHtml(s.trim())).filter(s => s).join("<br />");
+      }
+    });
+  </script>
+</body>
+</html>
