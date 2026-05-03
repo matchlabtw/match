@@ -36,10 +36,13 @@
         const round = 3;
         const surveyMainUrl = 'https://www.appsheet.com/start/315ec56c-2d4d-4d1f-bb22-3919daa834eb';
 
+		const createSurveyUrl = (baseUrl, source) =>
+            `${baseUrl}#control=Survey&defaults={%22source%22:%22${source}%22}`;
+
         window.onload = async function() {
             const source = 'threads';
             const slug = `round${round}:${source}`;
-            const targetUrl = surveyMainUrl;
+            const targetUrl = createSurveyUrl(surveyMainUrl, source);;
             console.log(source);
             console.log(slug);
             console.log(targetUrl);
