@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -37,16 +37,16 @@
         const surveyMainUrl = 'https://www.appsheet.com/start/315ec56c-2d4d-4d1f-bb22-3919daa834eb';
         const surveyLiteUrl = 'https://www.appsheet.com/start/d0ecefce-0ba9-4f00-a6fd-6fad7b6836d5';
 
-        const createSurveyUrl = (baseUrl, source) => 
+        const createSurveyUrl = (baseUrl, source) =>
             `${baseUrl}#control=Survey&defaults={%22source%22:%22${source}%22}`;
 
         // 1. 將 param 和 source 建立成簡單的對應表 (Dictionary)
         const sourceMap = {
-			lite: 'attended',
-			test: 'test',
-			wish: 'wish',
-			mw: 'match-webinar',
-			pw: 'past-webinar',
+            lite: 'attended',
+            test: 'test',
+            wish: 'wish',
+            mw: 'match-webinar',
+            pw: 'past-webinar',
             fb: 'facebook',
             ig: 'instagram',
             th: 'threads',
@@ -57,14 +57,15 @@
 
         window.onload = async function() {
             // 過濾多餘的網址參數：使用 .split('&')[0] 確保只抓取第一個參數，濾掉 fbclid 等贅字
-            const param = window.location.search.substring(1).split('&')[0];
+            var param = window.location.search.substring(1).split('&')[0];
+            param = param.includes('utm_source') ? param.replace('utm_source=', '') : param;
             const source = param === '' ? 'none' : (sourceMap[param] || param);
             const slug = `round${round}:${source}`;
             const targetUrl = createSurveyUrl(param === 'lite' ? surveyLiteUrl : surveyMainUrl, source);
             console.log(source);
             console.log(slug);
             console.log(targetUrl);
-            
+
             // 任務 1：發送 GA 的 Promise
             const taskGA = new Promise((resolve) => {
                 gtag('event', 'shortlink_click', {
@@ -84,7 +85,7 @@
                         fetch("https://api.ipify.org?format=json"),
                         new Promise((_, reject) => setTimeout(() => reject(new Error('IP Timeout')), 800))
                     ]);
-                    
+
                     if (ipResponse && ipResponse.ok) {
                         const ipData = await ipResponse.json();
                         clientIp = ipData.ip;
@@ -103,22 +104,22 @@
 
             // 設定 1 秒 (1000 毫秒) 的超時限制
             const timeoutLimit = new Promise((resolve) => {
-                setTimeout(() => resolve("timeout"), 1000); 
+                setTimeout(() => resolve("timeout"), 1000);
             });
 
             // 執行賽跑機制：
             // Promise.all([taskGA, taskApiData()]) 會讓兩個任務同時平行處理。
             // Promise.race 會看是「兩個任務都做完」比較快，還是「1 秒鐘的計時器」比較快。
             await Promise.race([
-                Promise.all([taskGA, taskApiData()]), 
+                Promise.all([taskGA, taskApiData()]),
                 timeoutLimit
             ]);
 
             // 時間到或是任務皆完成，執行轉址
-            window.location.replace(targetUrl);
+            //window.location.replace(targetUrl);
         };
     </script>
-    
+
     <style>
         body {
             font-family: sans-serif;
