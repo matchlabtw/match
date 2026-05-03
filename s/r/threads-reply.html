@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- Open Graph / 社群分享預覽標籤 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="瑪那熊配對實驗室" />
+    <meta property="og:description" content="緣分，從這裡開始 💛" />
+    <meta property="og:url" content="https://g.manabear.tw/s/r/threads.html" />
+    <meta property="og:image" content="https://hellomanabear.wordpress.com/wp-content/uploads/2026/05/e791aae982a3e7868ae6849be68385e9858de5b08d_1200x630.png" />
+
+    <!-- Twitter Card (用於 Twitter, Threads, 部分社群平台) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="瑪那熊配對實驗室" />
+    <meta name="twitter:description" content="緣分，從這裡開始 💛" />
+    <meta name="twitter:image" content="https://hellomanabear.wordpress.com/wp-content/uploads/2026/02/e791aae982a3e7868ae6849be68385e9858de5b08d_4x3.png" />
+
+    <title>瑪那熊配對實驗室｜第3輪配對</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2P7M7D2TJH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-2P7M7D2TJH');
+    </script>
+
+    <script>
+        const page = 'register';
+        const round = 3;
+        const surveyMainUrl = 'https://www.appsheet.com/start/315ec56c-2d4d-4d1f-bb22-3919daa834eb';
+
+		const createSurveyUrl = (baseUrl, source) =>
+            `${baseUrl}#control=Survey&defaults={%22source%22:%22${source}%22}`;
+
+        window.onload = async function() {
+            const source = 'threads-reply';
+            const slug = `round${round}:${source}`;
+            const targetUrl = createSurveyUrl(surveyMainUrl, source);;
+            console.log(source);
+            console.log(slug);
+            console.log(targetUrl);
+
+            // 任務 1：發送 GA 的 Promise
+            const taskGA = new Promise((resolve) => {
+                gtag('event', 'shortlink_click', {
+                    'slug': slug,
+                    'target_url': targetUrl,
+                    'event_callback': resolve, // 當 GA 成功送出後，會呼叫 resolve 結束這個 Promise
+                    'event_timeout': 1000      // GA 內建的安全機制，避免回呼失敗
+                });
+            });
+
+            // 任務 2：取得 IP 再呼叫 API 的 Promise
+            const taskApiData = async () => {
+                let clientIp = "unknown";
+                try {
+                    // 【優化 2】細分超時機制：取 IP 單獨設定 400ms 超時，避免卡死後續 GAS 請求
+                    const ipResponse = await Promise.race([
+                        fetch("https://api.ipify.org?format=json"),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('IP Timeout')), 800))
+                    ]);
+
+                    if (ipResponse && ipResponse.ok) {
+                        const ipData = await ipResponse.json();
+                        clientIp = ipData.ip;
+                    }
+                } catch (error) {
+                    console.warn("無法取得 IP 狀態或已超時");
+                }
+
+                try {
+                    const scriptApiUrl = `https://script.google.com/macros/s/AKfycbz6Vxe4G9ctRiHryu0lHi93cZB7uhV1ejlMSjftLNE9xO7e4HoI1axq99UB3j_cASjC/exec?page=${page}&source=${source}&ip=${clientIp}`;
+                    await fetch(scriptApiUrl, { mode: 'no-cors' });
+                } catch (error) {
+                    console.warn("API 呼叫失敗");
+                }
+            };
+
+            // 設定 1 秒 (1000 毫秒) 的超時限制
+            const timeoutLimit = new Promise((resolve) => {
+                setTimeout(() => resolve("timeout"), 1000);
+            });
+
+            // 執行賽跑機制：
+            // Promise.all([taskGA, taskApiData()]) 會讓兩個任務同時平行處理。
+            // Promise.race 會看是「兩個任務都做完」比較快，還是「1 秒鐘的計時器」比較快。
+            await Promise.race([
+                Promise.all([taskGA, taskApiData()]),
+                timeoutLimit
+            ]);
+
+            // 時間到或是任務皆完成，執行轉址
+            window.location.replace(targetUrl);
+        };
+    </script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="message">準備進入瑪那熊配對實驗室… 💛</h2>
+    </div>
+</body>
+</html>
