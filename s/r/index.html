@@ -11,14 +11,14 @@
     <!-- Open Graph / 社群分享預覽標籤 -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="瑪那熊配對實驗室" />
-    <meta property="og:description" content="準備進入瑪那熊配對實驗室，點擊即可前往專屬頁面。" />
+    <meta property="og:description" content="一段可能的緣分，就從這裡開始 💛" />
     <meta property="og:url" content="https://g.manabear.tw/s/r" /> <!-- 請替換為您的實際網址 -->
     <meta property="og:image" content="https://hellomanabear.wordpress.com/wp-content/uploads/2026/05/e791aae982a3e7868ae6849be68385e9858de5b08d_1200x630.png" />
 
     <!-- Twitter Card (用於 Twitter, Threads, 部分社群平台) -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="瑪那熊配對實驗室" />
-    <meta name="twitter:description" content="準備進入瑪那熊配對實驗室，點擊即可前往專屬頁面。" />
+    <meta name="twitter:description" content="一段可能的緣分，就從這裡開始 💛" />
     <meta name="twitter:image" content="https://hellomanabear.wordpress.com/wp-content/uploads/2026/02/e791aae982a3e7868ae6849be68385e9858de5b08d_4x3.png" />
 
     <title>瑪那熊配對實驗室｜第3輪配對</title>
@@ -54,7 +54,7 @@
         };
 
         window.onload = async function() {
-            // 【優化 1】過濾多餘的網址參數：使用 .split('&')[0] 確保只抓取第一個參數，濾掉 fbclid 等贅字
+            // 過濾多餘的網址參數：使用 .split('&')[0] 確保只抓取第一個參數，濾掉 fbclid 等贅字
             const param = window.location.search.substring(1).split('&')[0];
             const source = param === '' ? 'none' : (sourceMap[param] || param);
             const slug = `round${round}:${source}`;
