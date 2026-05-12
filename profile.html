@@ -50,7 +50,7 @@
     <div class="card profile-card bg-white border-0 text-center w-100" style="max-width: 450px;">
       <div class="card-body p-4 p-md-5">
         <img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/03/e791aae982a3e7868ae6849be68385e9858de5b08d_e58ebbe8838c_e696b0_e7b78ae8b2bc.png" alt="LoveMatch" width="150" class="img-fluid mb-4" />
-        <h4 class="fw-bold text-brand-dark mb-4">第2輪報名資料查詢</h4>
+        <h4 class="fw-bold text-brand-dark mb-4">第3輪報名資料查詢</h4>
 
         <div class="text-start mb-3">
           <label for="input-email" class="form-label text-brand-gray fw-bold" style="font-size: 14px;">電子信箱 (Email)</label>
@@ -170,6 +170,13 @@
     }
 
     $(document).ready(function() {
+      // 頁面載入時，檢查是否有存過的資料並填入
+      const savedEmail = localStorage.getItem("match_lab_email");
+      const savedBirthYear = localStorage.getItem("match_lab_birthYear");
+
+      if (savedEmail) $("#input-email").val(savedEmail);
+      if (savedBirthYear) $("#input-birthYear").val(savedBirthYear);
+	  
       // 請將下方替換為你的 GAS 部署網址
       const API_URL = "https://script.google.com/macros/s/AKfycbydGuqYmF_u_CVxfsq1q2dTKTmOkFtEG-Hyq1slVPPgacGuNhrfMDHIHy93MrLnEdnlRA/exec";
 
@@ -204,6 +211,10 @@
           showError("⚠️ 出生年需介於 35 到 92 之間");
           return;
         }
+
+        // 驗證成功後，存入 localStorage
+        localStorage.setItem("match_lab_email", email);
+        localStorage.setItem("match_lab_birthYear", birthYear);
 
         isFetching = true;
         $("#btn-submit").prop("disabled", true).text("查詢中...");
