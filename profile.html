@@ -322,7 +322,7 @@
         $("#contact-list div, #contact-list a, #block-suggestion-container").hide();
 
         if (data["身分驗證方式"]) { $("#val-auth_method").text(data["身分驗證方式"]); $("#block-auth_method").show(); }
-        if (data["Email"]) { $("#val-email_id").text(data["Email"]); $("#block-email").show(); }
+        if (data["email"]) { $("#val-email_id").text(data["email"]); $("#block-email").show(); }
 
         if (data["分享社群帳號"]) {
             $("#val-share_social").text(data["分享社群帳號"]);
@@ -331,7 +331,7 @@
 
         // 修改過的社群連結 JS 邏輯
         if (data["Social ID"]) {
-          let socialId = data["Social ID"];
+          let socialId = data["social_id"];
           let authMethod = data["身分驗證方式"];
           let socialUrl = "#";
           let socialLabel = "社群 ID (點擊前往)";
