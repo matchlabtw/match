@@ -102,7 +102,9 @@
 
         <div class="section-divider">
           <h5 class="fw-bold text-brand-dark mb-4">🔍 生活與工作側寫</h5>
-          <div id="val-life_work"></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">生活</span><div id="val-life" class="fw-bold"></div></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">收藏品</span><div id="val-collectible" class="fw-bold"></div></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">工作</span><div id="val-work" class="fw-bold"></div></div>
         </div>
 
         <div class="section-divider">
@@ -119,9 +121,10 @@
           </div>
         </div>
 
-        <div class="section-divider" id="block-suggestion-container" style="display:none;">
-          <h5 class="fw-bold text-brand-dark mb-4">💡 建議</h5>
-          <div class="info-box mb-0"><span id="val-suggestion" class="fw-bold"></span></div>
+        <div class="section-divider">
+          <h5 class="fw-bold text-brand-dark mb-4">💡 其他</h5>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">願意匿名分享你填寫的內容嗎?</span><div id="val-anonymous-sharing" class="fw-bold"></div></div>
+          <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">建議</span><div id="val-suggestion" class="fw-bold"></div></div>
         </div>
       </div>
     </div>
@@ -176,7 +179,7 @@
 
       if (savedEmail) $("#input-email").val(savedEmail);
       if (savedBirthYear) $("#input-birthYear").val(savedBirthYear);
-	  
+
       // 請將下方替換為你的 GAS 部署網址
       const API_URL = "https://script.google.com/macros/s/AKfycbydGuqYmF_u_CVxfsq1q2dTKTmOkFtEG-Hyq1slVPPgacGuNhrfMDHIHy93MrLnEdnlRA/exec";
 
@@ -306,17 +309,29 @@
         $("#val-target_marriage_status").html(formatMultiLine(data["對象婚姻狀態"]));
         $("#val-compatibility").html(formatCompatibility(data));
 
-        let lifeWorkHtml = "";
+        let lifeHtml = "";
         if (data["生活照網址"]) {
-            lifeWorkHtml += `<img src="${escapeHtml(data["生活照網址"])}" alt="生活照" class="img-fluid rounded-4 w-100 mb-4" />`;
+            lifeHtml += `<img src="${escapeHtml(data["生活照網址"])}" alt="生活照" class="img-fluid rounded-4 w-100 mb-4" />`;
         }
         if (data["簡單描述你的生活"]) {
-            lifeWorkHtml += `<div class="mb-3">${escapeHtml(data["簡單描述你的生活"]).replace(/\n/g, "<br/>")}</div>`;
+            lifeHtml += `<div class="mb-3">${escapeHtml(data["簡單描述你的生活"]).replace(/\n/g, "<br/>")}</div>`;
         }
+        $("#val-life").html(lifeHtml || "未填寫");
+
+        let collectibleHtml = "";
+        if (data["收藏品網址"]) {
+            collectibleHtml += `<img src="${escapeHtml(data["收藏品網址"])}" alt="收藏品" class="img-fluid rounded-4 w-100 mb-4" />`;
+        }
+        if (data["簡單描述你的收藏品"]) {
+            collectibleHtml += `<div class="mb-3">${escapeHtml(data["簡單描述你的收藏品"]).replace(/\n/g, "<br/>")}</div>`;
+        }
+        $("#val-collectible").html(collectibleHtml || "未填寫");
+
+        let workHtml = "";
         if (data["簡單描述你的工作"]) {
-            lifeWorkHtml += `<div class="mb-3"><b>關於我的工作：</b><br/>${escapeHtml(data["簡單描述你的工作"]).replace(/\n/g, "<br/>")}</div>`;
+            workHtml += `<div class="mb-3">${escapeHtml(data["簡單描述你的工作"]).replace(/\n/g, "<br/>")}</div>`;
         }
-        $("#val-life_work").html(lifeWorkHtml || '<div class="info-box">未填寫</div>');
+        $("#val-work").html(workHtml || "未填寫");
 
         // 將所有可能動態顯示的欄位先隱藏
         $("#contact-list div, #contact-list a, #block-suggestion-container").hide();
@@ -330,7 +345,7 @@
         }
 
         // 修改過的社群連結 JS 邏輯
-        if (data["Social ID"]) {
+        if (data["social_id"]) {
           let socialId = data["social_id"];
           let authMethod = data["身分驗證方式"];
           let socialUrl = "#";
@@ -355,7 +370,8 @@
           $("#val-social_link").attr("href", socialUrl).show();
         }
 
-        if (data["建議"]) { $("#val-suggestion").text(data["建議"]); $("#block-suggestion-container").show(); }
+        $("#val-anonymous-sharing").html(data["願意匿名分享你填寫的內容嗎?"] || "未填寫");
+        $("#val-suggestion").html(data["建議"] || "未填寫");
       }
 
       function formatCompatibility(data) {
