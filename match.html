@@ -105,6 +105,7 @@
 			  <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">生活</span><div id="val-life" class="fw-bold"></div></div>
 			  <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">收藏品</span><div id="val-collectible" class="fw-bold"></div></div>
 			  <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">工作</span><div id="val-work" class="fw-bold"></div></div>
+			  <div class="info-box"><span class="text-brand-gray d-block mb-1" style="font-size: 12px;">社群帳號</span><div id="val-social" class="fw-bold"></div></div>
 			</div>
 
 			<div class="section-divider">
@@ -126,14 +127,6 @@
 				<span class="text-brand-red d-block mb-1 fw-bold" style="font-size: 14px;"  > LINE ID (雙方已同意交換 LINE！，點擊加好友，記得先傳送一則 Hello 訊息 👋)</span>
 				<span id="val-line-id" class="text-brand-dark fw-bolder" style="font-size: 22px;"></span>
 			  </a>
-
-			  <!--
-			  <a href="https://www.instagram.com/" target="_blank" class="d-block text-decoration-none text-center mb-4" style="background-color: #fdf2f8; border: 2px solid #fce7f3; border-radius: 12px; padding: 20px; transition: all 0.3s ease;">
-				<span class="text-white fw-bold d-inline-block mb-2" style="background-color: #ec4899; font-size: 11px; padding: 4px 10px; border-radius: 6px;">生活動態分享</span><br />
-				<span class="text-brand-gray d-block mb-1" style="font-size: 12px;">INSTAGRAM (點擊前往)</span>
-				<span class="text-brand-dark fw-bolder" style="font-size: 22px;"></span>
-			  </a>
-			  -->
 
 			  <div id="task-block" class="mb-2 d-none" style="font-size: 16px; color: #4b5563; line-height: 1.6;">
 				<span class="text-brand-red fw-bold">小任務：<br />請與對方分享最近生活中的一件趣事，或是問卷照片背後的小故事。</span><br />
@@ -424,47 +417,25 @@
           console.log('雙方不同意');
         }
 
-        // 處理 Instagram 顯示
-        if (data["Social ID"]) {
-          $("#val-ig-id").text(data["Social ID"]);
-          $("#social-ig").attr("href", "https://www.instagram.com/" + data["Social ID"]).show();
-        } else {
-          $("#social-ig").hide();
-        }
-
-        if (data["身分驗證方式"]) { $("#val-auth_method").text(data["身分驗證方式"]); $("#block-auth_method").show(); }
-        if (data["Email"]) { $("#val-email_id").text(data["Email"]); $("#block-email").show(); }
-
-        if (data["分享社群帳號"]) {
-            $("#val-share_social").text(data["分享社群帳號"]);
-            $("#block-share_social").show();
-        }
-
-        // 修改過的社群連結 JS 邏輯
-        if (data["Social ID"]) {
-          let socialId = data["Social ID"];
+		let socialHtml = "";
+		if (data["身分驗證方式"] !== "不提供") {
+		  console.log(data["social_id"], data["身分驗證方式"]);
+          let socialId = data["social_id"];
           let authMethod = data["身分驗證方式"];
           let socialUrl = "#";
-          let socialLabel = "社群 ID (點擊前往)";
 
           if (authMethod === "Facebook") {
             socialUrl = escapeHtml(socialId);
-            socialLabel = "Facebook ID (點擊前往)";
           } else if (authMethod === "Threads") {
-            // 處理 Threads 帳號可能帶有 @ 的情況
-            let cleanId = socialId.startsWith('@') ? socialId.substring(1) : socialId;
-            socialUrl = "https://www.threads.net/@" + escapeHtml(cleanId);
-            socialLabel = "Threads ID (點擊前往)";
-          } else {
-            // 預設或 Instagram
+            socialUrl = "https://www.threads.net/@" + escapeHtml(socialId);
+          } else if (authMethod === "Instagram") {
             socialUrl = "https://www.instagram.com/" + escapeHtml(socialId);
-            socialLabel = "Instagram ID (點擊前往)";
           }
 
-          $("#val-social_label").text(socialLabel);
-          $("#val-social_id").text(socialId);
-          $("#val-social_link").attr("href", socialUrl).show();
+		  socialHtml += `<span>${authMethod} (點擊前往): <a href="${socialUrl}" target="_blank">${socialId}</a></span><br>
+		  <span class="fw-bold text-brand-red">在雙方同意交換 LINE 前，請先不要直接私訊對方 💛</span>`;
         }
+		$("#val-social").html(socialHtml || "未填寫");
 
         let userEmail = $("#input-email").val().trim();
         let surveyUrl = `https://www.appsheet.com/start/80799a46-85c9-4833-b3ac-3ab104fc6ce5#control=Survey&defaults={%22Email%22:%22${encodeURIComponent(userEmail)}%22}`;
