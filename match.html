@@ -418,7 +418,7 @@
         }
 
 		let socialHtml = "";
-		if (data["身分驗證方式"] !== "不提供" || data["分享社群帳號"] === "是") {
+		if (data["身分驗證方式"] !== "不提供" && data["分享社群帳號"] === "是") {
 		  console.log(data["social_id"], data["身分驗證方式"]);
           let socialId = data["social_id"];
           let authMethod = data["身分驗證方式"];
