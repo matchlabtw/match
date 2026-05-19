@@ -145,21 +145,10 @@
 
 		  <!-- 未配對成功顯示區域 -->
 		  <div id="unmatched-ui" style="display: none;">
-			  <div class="unmatched-message">
-				謝謝你參加這一輪的「瑪那熊配對實驗」。<br /><br />
-				這一輪，我們還沒有為你找到合適的配對對象。<br />
-				但這不代表你不適合誰，也不是你少了什麼。<br /><br />
-				有時候，只是還沒剛好遇見那個頻率對上的人。<br /><br />
-				願意認真填寫問卷、思考關係的你，<br />
-				其實已經走在很多人前面了。<br /><br />
-				在真正相遇之前，<br />
-				這段時間，也許正讓你慢慢變得更自在、穩定，也更發光 ✨<br /><br />
-				<span class="fw-bold text-brand-red">💌 下一輪配對很快就會開始</span><br />
-				我們也會第一時間通知你，持續幫你留意合適的對象<br /><br />
-				謝謝你的參與，我們會繼續幫忙找那位剛剛好的人。<br /><br />
-				瑪那熊配對實驗室<br /><br />
-				💡 若有任何問題，請來信至瑪那熊官方信箱：<br />
-				mulberrymore@gmail.com
+			  <div class="unmatched-message" style="text-align: center;">
+				<img src="https://hellomanabear.wordpress.com/wp-content/uploads/2026/05/e9858de5b08de69caae68890e58a9f.png" alt="未配對成功" style="display: block; margin: 0 auto 20px auto; max-width: 100%; height: auto; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+				💡 若有任何問題，請來信至瑪那熊官方信箱<br />
+				mulberrymore@gmail.com <span onclick="copyEmail()" style="cursor: pointer; color: #007BFF; text-decoration: underline;" title="點擊複製">(點擊複製)</span> 
 			  </div>
 		  </div>
 	  </div>
@@ -464,6 +453,16 @@
         return str.split(/[,，]/).map(s => escapeHtml(s.trim())).filter(s => s).join("<br />");
       }
     });
+	
+    function copyEmail() {
+      // 使用 Clipboard API 複製文字
+      navigator.clipboard.writeText("mulberrymore@gmail.com").then(function() {
+          alert("信箱已成功複製！");
+      }).catch(function(err) {
+          alert("複製失敗，請手動選取複製。");
+          console.error('複製失敗:', err);
+      });
+    }
   </script>
 </body>
 </html>
